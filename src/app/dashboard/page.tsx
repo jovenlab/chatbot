@@ -17,7 +17,7 @@ export default function DashboardPage() {
     setInput('');
 
     try {
-        const res = await fetch('https://chatbot-backend-wipk.onrender.com/chat/', {
+        const res = await fetch('https://chatbot-backend-wipk.onrender.com/api/chat/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
