@@ -9,21 +9,39 @@ export default function DashboardPage() {
   ])
   const [input, setInput] = useState('')
 
-  const handleSend = () => {
-    if (!input.trim()) return
+  const handleSend = async () => {
+    if (!input.trim()) return;
 
-    setMessages([...messages, { sender: 'user', text: input }])
-    setInput('')
+    const userMessage = input;
+    setMessages([...messages, { sender: 'user', text: userMessage }]);
+    setInput('');
 
-    // Placeholder bot response
-    setTimeout(() => {
-      setMessages(prev => [
+    try {
+        const res = await fetch('https://chatbot-backend-wipk.onrender.com/chat/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userMessage }),
+        });
+
+        const data = await res.json();
+        const botReply = data.response;
+
+        setMessages(prev => [
         ...prev,
-        { sender: 'user', text: input },
-        { sender: 'rizal', text: 'That is a thought-provoking question. Let us reflect on our history.' },
-      ])
-    }, 800)
-  }
+        { sender: 'user', text: userMessage },
+        { sender: 'rizal', text: botReply },
+        ]);
+    } catch (err) {
+        console.error('Error communicating with Django chatbot:', err);
+        setMessages(prev => [
+        ...prev,
+        { sender: 'rizal', text: 'Sorry, there was a problem connecting to the server.' },
+        ]);
+        }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
