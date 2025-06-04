@@ -6,58 +6,86 @@ import { SendHorizonal, Sparkles } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 
 
+
 export default function DashboardPage() {
-    const [sessionId, setSessionId] = useState('')
+  const [sessionId, setSessionId] = useState('')
     const [messages, setMessages] = useState([
         { sender: 'rizal', text: 'Kamusta! I am Jose Rizal. How may I assist you today?' },
     ])
-    const [input, setInput] = useState('')
+  const [input, setInput] = useState('')
 
-    useEffect(() => {
-        const existing = localStorage.getItem('rizal-session-id')
-        if (existing) {
-            setSessionId(existing)
+  // Load or create session ID
+  useEffect(() => {
+    const existing = localStorage.getItem('rizal-session-id')
+    if (existing) {
+      setSessionId(existing)
+    } else {
+      const newId = uuidv4()
+      localStorage.setItem('rizal-session-id', newId)
+      setSessionId(newId)
+    }
+  }, [])
+
+  // Fetch message history once sessionId is available
+  useEffect(() => {
+    if (!sessionId) return
+
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch('https://chatbot-backend-wipk.onrender.com/api/history/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ session_id: sessionId }),
+        })
+        const data = await res.json()
+        if (data.messages.length === 0) {
+          // If no messages yet, start with a greeting
+          setMessages([
+            { sender: 'rizal', text: 'Kamusta! I am Jose Rizal. How may I assist you today?' },
+          ])
         } else {
-            const newId = uuidv4()
-            setSessionId(newId)
-            localStorage.setItem('rizal-session-id', newId)
+          setMessages(data.messages)
         }
-    }, [])
+      } catch (err) {
+        console.error('Error fetching message history:', err)
+      }
+    }
 
-    const handleSend = async () => {
-    if (!input.trim()) return;
+    fetchHistory()
+  }, [sessionId])
 
-    const userMessage = input;
-    setInput(''); // Clear the input early for snappiness
+  const handleSend = async () => {
+    if (!input.trim()) return
+
+    const userMessage = input
+    setInput('')
+
+    // Show user message immediately
+    setMessages(prev => [...prev, { sender: 'user', text: userMessage }])
 
     try {
-        const res = await fetch('https://chatbot-backend-wipk.onrender.com/api/chat/', {
+      const res = await fetch('https://chatbot-backend-wipk.onrender.com/api/chat/', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMessage, session_id: sessionId  }),
-        });
+        body: JSON.stringify({ message: userMessage, session_id: sessionId }),
+      })
 
-        const data = await res.json();
-        const botReply = data.response;
+      const data = await res.json()
+      const botReply = data.response
 
-        setMessages(prev => [
-        ...prev,
-        { sender: 'user', text: userMessage },
-        { sender: 'rizal', text: botReply },
-        ]);
+      setMessages(prev => [...prev, { sender: 'rizal', text: botReply }])
     } catch (err) {
-        console.error('Error communicating with Django chatbot:', err);
-        setMessages(prev => [
+      console.error('Error communicating with Django chatbot:', err)
+      setMessages(prev => [
         ...prev,
-        { sender: 'user', text: userMessage },  // Still show user's message even on error
         { sender: 'rizal', text: 'Sorry, there was a problem connecting to the server.' },
-        ]);
+      ])
     }
-    };
-
-
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
