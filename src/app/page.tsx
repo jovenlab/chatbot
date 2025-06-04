@@ -6,7 +6,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("https://your-django-api.onrender.com/api/hello/")
+    fetch("https://chatbot-backend-wipk.onrender.com/api/hello/")
       .then(res => res.json())
       .then(data => setMessage(data.message));
   }, []);
