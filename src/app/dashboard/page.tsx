@@ -1,13 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SendHorizonal, Sparkles } from 'lucide-react'
 
+import { v4 as uuidv4 } from 'uuid'
+
+
 export default function DashboardPage() {
-  const [messages, setMessages] = useState([
-    { sender: 'rizal', text: 'Kamusta! I am Jose Rizal. How may I assist you today?' },
-  ])
-  const [input, setInput] = useState('')
+    const [sessionId, setSessionId] = useState('')
+    const [messages, setMessages] = useState([
+        { sender: 'rizal', text: 'Kamusta! I am Jose Rizal. How may I assist you today?' },
+    ])
+    const [input, setInput] = useState('')
+
+    useEffect(() => {
+        const existing = localStorage.getItem('rizal-session-id')
+        if (existing) {
+            setSessionId(existing)
+        } else {
+            const newId = uuidv4()
+            setSessionId(newId)
+            localStorage.setItem('rizal-session-id', newId)
+        }
+    }, [])
 
     const handleSend = async () => {
     if (!input.trim()) return;
@@ -21,7 +36,7 @@ export default function DashboardPage() {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, session_id: sessionId  }),
         });
 
         const data = await res.json();
