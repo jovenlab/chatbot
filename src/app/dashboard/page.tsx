@@ -9,12 +9,11 @@ export default function DashboardPage() {
   ])
   const [input, setInput] = useState('')
 
-  const handleSend = async () => {
+    const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMessage = input;
-    setMessages([...messages, { sender: 'user', text: userMessage }]);
-    setInput('');
+    setInput(''); // Clear the input early for snappiness
 
     try {
         const res = await fetch('https://chatbot-backend-wipk.onrender.com/api/chat/', {
@@ -37,10 +36,12 @@ export default function DashboardPage() {
         console.error('Error communicating with Django chatbot:', err);
         setMessages(prev => [
         ...prev,
+        { sender: 'user', text: userMessage },  // Still show user's message even on error
         { sender: 'rizal', text: 'Sorry, there was a problem connecting to the server.' },
         ]);
-        }
-};
+    }
+    };
+
 
 
   return (
