@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Navbar from './components/Navbar';
 
 export default function HomePage() {
   const [message, setMessage] = useState('');
@@ -16,13 +17,14 @@ export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col bg-white">
       {/* Navbar */}
-      <nav className="w-full px-6 py-4 shadow flex justify-between items-center bg-blue-600 text-white">
+      {/* <nav className="w-full px-6 py-4 shadow flex justify-between items-center bg-blue-600 text-white">
         <h1 className="text-xl font-bold">My App</h1>
         <div className="space-x-4">
           <Link href="/login" className="hover:underline">Login</Link>
           <Link href="/register" className="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-100">Register</Link>
         </div>
-      </nav>
+      </nav> */}
+      <Navbar/>
 
       {/* Hero */}
       <section className="flex flex-col items-center justify-center text-center flex-1 px-6 py-12 bg-blue-50">

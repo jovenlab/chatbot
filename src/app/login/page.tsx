@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const { login } = useAuth();
+  const router = useRouter();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -17,9 +21,9 @@ export default function LoginPage() {
 
     const data = await res.json();
     if (res.ok) {
-      localStorage.setItem('access', data.access);
-      localStorage.setItem('refresh', data.refresh);
+      login(data.access, data.refresh);
       setMessage('✅ Logged in successfully!');
+      router.push('/dashboard'); // redirect to a protected page
     } else {
       setMessage(data.detail || 'Login failed');
     }
