@@ -72,6 +72,7 @@ export default function DashboardPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ message: userMessage, session_id: sessionId }),
       })
 
